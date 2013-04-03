@@ -1,20 +1,24 @@
 var Stack = function(){
-	this.array = new Array();
-	this.i = new Int();
+	this.array = [];
+	this.i = 0;
+	this.h = 1;
 	this.push = function(x){	
-		array[	
+		this.array[this.i] = x;
+		this.i++;	
 	}	
 	this.pop = function(){
-		return this.array.pop();
+		var j = this.array.length - this.h;
+		this.h++;
+		return this.array[j];
 	}
 }
 function main(){
-	var s = new Stack(){
-		s.push(1);
-		s.push(2);
+	var s = new Stack();
+	s.push(1);
+	s.push(2);
 	
-		alert(s.pop());
-		alert(s.pop());
-	}
+	console.log(s.pop());
+	console.log(s.pop());
+	
 }
-		
+main();		
