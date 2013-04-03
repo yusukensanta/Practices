@@ -16,9 +16,12 @@ function main(){
 	var s = new Stack();
 	s.push(1);
 	s.push(2);
+	s.push(9);
+	s.push(2);
 	
 	console.log(s.pop());
 	console.log(s.pop());
-	
+	console.log(s.pop());
+	console.log(s.pop());
 }
 main();		
