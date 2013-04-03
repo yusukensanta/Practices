@@ -4,7 +4,7 @@ var Stack = function(){
 		this.array.push(x);	
 	}	
 	this.pop = function(){
-		this.array.pop();
+		return this.array.pop();
 	}
 }
 
