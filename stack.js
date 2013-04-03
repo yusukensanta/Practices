@@ -1,18 +1,20 @@
 var Stack = function(){
 	this.array = new Array();
+	this.i = new Int();
 	this.push = function(x){	
-		this.array.push(x);	
+		array[	
 	}	
 	this.pop = function(){
 		return this.array.pop();
 	}
 }
-
-var s = new Stack(){
-	s.push(1);
-	s.push(2);
+function main(){
+	var s = new Stack(){
+		s.push(1);
+		s.push(2);
 	
-	alert(s.pop());
-	alert(s.pop());
+		alert(s.pop());
+		alert(s.pop());
+	}
 }
 		
