@@ -16,6 +16,10 @@ repl.on("line",function(line){
 	});
 
 var L_Analysis = function(line){
-	var Term = line.split(" ");
-	return Term[0];
+	var Term[];
+	var n = 0;
+	while(line.charAt[n] != null){
+		Term[n] == line.charAt[n];	
+		n++;
 }	
+	
