@@ -1,4 +1,4 @@
-var quicksort = function(array,leftnum,rightnum){
+var quicksort = function (array,leftnum,rightnum){
 	this.rightarray = [];
 	this.leftarray  = [];
 	var indexleft   = leftnum;
@@ -7,11 +7,9 @@ var quicksort = function(array,leftnum,rightnum){
 
 	pivot = (leftnum+rightnum)/2
 
-	while(1){
+	while(indexleft > indexright){
 		while(array[indexleft]<pivot)indexleft++;
 		while(array[indexright]>pivot)indexright--;
-	
-		if(indexleft>indexright) break;
 	
 		exchange(array[indexleft], array[indexright]);
 	}
@@ -21,7 +19,7 @@ var quicksort = function(array,leftnum,rightnum){
 	return array;
 }
 
-var exchange = function(left, right){
+function exchange(left, right){
 	var change;
 	
 	change = left;
@@ -29,11 +27,9 @@ var exchange = function(left, right){
 	right  = change;
 }
 
-
 var array = [2,5,6,7,9,1,1,2,4,8];
 quicksort(array,0,array.length);
 
 for(var index = 0; index< array.length; index++){
 	console.log(array[index]);
 }
-	
