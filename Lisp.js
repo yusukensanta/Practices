@@ -7,7 +7,7 @@ repl.prompt();
 
 repl.on("line",function(line){
 	console.log("here!");
-	L_Analysis(line);
+	Analysis(line);
 	repl.prompt();
 	});
 	
@@ -16,27 +16,34 @@ repl.on("line",function(line){
 	
 	});
 
-var L_Analysis = function(line){
+var Analysis = function(line){
 	var Term = [];
 	var indexIn  = 0, indexOut = 0, character;
 	console.log("right here!");
-	while(line.charAt(indexIn) > line.charAt(line.length)){
+	while(indexIn <= line.length){
 		character = line.charAt(indexIn);
-		
-		if(character.match(/[0-9]/) || character.match("-")){	
-			while(line.charAt(indexIn++) != " "){
-				character = character + line.charAt(indexIn);	
+		console.log("indexIN = "  + indexIn);
+		console.log("indexOut = " + indexOut);
+		if(character.match(/[0-9]/) || character.match("-")){
+			var countIn1 = indexIn + 1;
+			while(line.charAt(countIn1) != " " && countIn1 <= line.length && line.charAt(countIn1).match(/[0-9]/)){
+				character = character + line.charAt(countIn1);
+				countIn1++;
 			}
+			indexIn = countIn1;
 			Term[indexOut] = character;		
-			console.log("Number");
-			indexOut++;				
+			console.log(character);
+			indexOut++;	
 		}
-		else if(character.match(/[a-z]/) || character.match(/[A-Z]/)){
-			while(line.charAt(indexIn++) != " "){
-				character = character + line.charAt(indexIn)			
+		else if(character.match(/[a-z]|[A-Z]/)){
+			var countIn2 = indexIn + 1; 
+			while(line.charAt(countIn2) != " " && countIn2 <=line.length && line.charAt(countIn2).match(/[a-z]|[A-Z]/)) {
+				character = character + line.charAt(countIn2)
+				countIn2++;			
 			}
+			indexIn = countIn2;
 			Term[indexOut] = character;
-			console.log("Character");
+			console.log(character);
 			indexOut++;
 		}else if(character == " "){
 			indexIn++;
@@ -44,7 +51,8 @@ var L_Analysis = function(line){
 		}
 		else{
 			Term[indexOut] = character; indexIn++; indexOut++;
-			console.log("Symbol");
+			console.log(character);
 		}
 	}
 }	
+
