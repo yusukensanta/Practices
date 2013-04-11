@@ -16,8 +16,11 @@ repl.on("line",function(line){
 	});
 
 var Analysis = function(line){
-	var Term = [];
+	
+	var Term = [];//字句解析した文字列を格納する配列
 	var indexIn  = 0, indexOut = 0, character;
+
+	//入力文字列を読み込む
 	while(indexIn <= line.length){
 		character = line.charAt(indexIn);
 		if(character.match(/[0-9]/) || character.match("-")){
@@ -27,14 +30,14 @@ var Analysis = function(line){
 				countIn1++;
 			}
 			indexIn = countIn1;
-			Term[indexOut] = character;		
-			indexOut++;	
+			Term[indexOut] = character;
+			indexOut++;
 		}
 		else if(character.match(/[a-zA-Z]/)){
-			var countIn2 = indexIn + 1; 
+			var countIn2 = indexIn + 1;
 			while(line.charAt(countIn2) != " " && countIn2 <=line.length && line.charAt(countIn2).match(/[a-zA-Z]/)) {
 				character = character + line.charAt(countIn2)
-				countIn2++;			
+				countIn2++;		
 			}
 			indexIn = countIn2;
 			Term[indexOut] = character;
@@ -46,31 +49,33 @@ var Analysis = function(line){
 			Term[indexOut] = character; indexIn++; indexOut++;
 		}
 	}
-	S_Analysis(Term);
-}	
-
-var S_Analysis = function(Term){
-	var Index = 0;
-	var Calculate = [];
-
-	while(Index <= Term.length){
-		if(Term[Index] == ')'){
-			var InNum = 0;
-		 	BackIndex = Index - 1;
-			while(Term[BackIndex] != '('){
-				Calculate[InNum] = Term[BackIndex];
-				InNum++;
-				BackIndex--;
-			}
-			Term.splice(BackIndex + 1, (Index - BackIndex));
-			Term[BackIndex] = Calc(Calculate[2],Calculate[1],Calculate[0]);
-		Index = -1;
-		}
-	Index++;
-	}
-	console.log(Term[0]);
+	console.log(useCons(Term,1));
+	
 }
 
+/*
+var useCons = function(list,count){
+	if(list[count] == '('){
+		new Cons(new Cons(useCons(list[], count)) ,new Cons(useCons(list[], count)));
+		count++;
+		}
+	else{
+		new Cons(list[count], new Cons(useCons(list[count++],count));
+		}
+	}
+}*/
+		
+
+var Cons = (function(){
+	function Cons(type,car,cdr){
+		this.type = type;
+		this.car  = car;
+		this.cdr  = cdr;
+	}
+	return Cons;
+})();
+
+//各種演算
 var Calc = function (operater, number1, number2){
 	var num1 = parseInt(number1);
 	var num2 = parseInt(number2);
@@ -86,6 +91,19 @@ var Calc = function (operater, number1, number2){
 			result = num1 / num2; break;
 		case '%':
 			result = num1 % num2; break;
+		case '<':
+			result = T; break;
+		case '=':
+			result = Nil; break;
 	}
 	return result;
+}
+
+//変数定義
+var setq = function (variable, value){
+	variable = value;
+}
+
+var defun = function(func,arg,express){
+	var func = function(arg);
 }
