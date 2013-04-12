@@ -30,14 +30,14 @@ var Analysis = function(line){
 				countIn1++;
 			}
 			indexIn = countIn1;
-			Term[indexOut] = character;
-			indexOut++;
+			Term[indexOut] = character;		
+			indexOut++;	
 		}
 		else if(character.match(/[a-zA-Z]/)){
-			var countIn2 = indexIn + 1;
+			var countIn2 = indexIn + 1; 
 			while(line.charAt(countIn2) != " " && countIn2 <=line.length && line.charAt(countIn2).match(/[a-zA-Z]/)) {
 				character = character + line.charAt(countIn2)
-				countIn2++;		
+				countIn2++;			
 			}
 			indexIn = countIn2;
 			Term[indexOut] = character;
@@ -49,22 +49,10 @@ var Analysis = function(line){
 			Term[indexOut] = character; indexIn++; indexOut++;
 		}
 	}
-	console.log(useCons(Term,1));
-	
+	MakeCons(Term,0);
 }
 
-/*
-var useCons = function(list,count){
-	if(list[count] == '('){
-		new Cons(new Cons(useCons(list[], count)) ,new Cons(useCons(list[], count)));
-		count++;
-		}
-	else{
-		new Cons(list[count], new Cons(useCons(list[count++],count));
-		}
-	}
-}*/
-		
+
 
 var Cons = (function(){
 	function Cons(type,car,cdr){
@@ -75,35 +63,12 @@ var Cons = (function(){
 	return Cons;
 })();
 
-//各種演算
-var Calc = function (operater, number1, number2){
-	var num1 = parseInt(number1);
-	var num2 = parseInt(number2);
-	var result;
-	switch (operater){
-		case '+':
-			result = num1 + num2; break;
-		case '-':
-			result = num1 - num2; break;
-		case '*':
-			result = num1 * num2; break;
-		case '/':
-			result = num1 / num2; break;
-		case '%':
-			result = num1 % num2; break;
-		case '<':
-			result = T; break;
-		case '=':
-			result = Nil; break;
+
+var MakeCons = function(Term,num){
+	for(var i = num; i < Term.length;i++){
+		if(Term[i] == ")"){
+			break;
 	}
-	return result;
 }
 
-//変数定義
-var setq = function (variable, value){
-	variable = value;
-}
-
-var defun = function(func,arg,express){
-	var func = function(arg);
-}
+	
