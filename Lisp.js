@@ -21,7 +21,7 @@ var Analysis = function(line){
 	var indexIn  = 0, indexOut = 0, character;
 
 	//入力文字列を読み込む
-	while(indexIn <= line.length){
+	while(indexIn < line.length){
 		character = line.charAt(indexIn);
 		if(character.match(/[0-9]/) || character.match("-")){
 			var countIn1 = indexIn + 1;
@@ -67,32 +67,32 @@ var Cons = (function(){
 
 var MakeCons = function(Term,num){
 	var cons;
-	while(num <= Term.length){
-		switch(Term[num]){
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '%':
-			case "if":
-				cons = new Cons("Operation", Term[num], MakeCons(Term,num+1));break;
-			case '(':
-				if(num == 0){
-					cons = new Cons("Car", Term[num],MakeCons(Term,num+1));break;
-				}
-				else{
-					cons = new Cons("Car", MakeCons(Term, num+1),MakeCons(Term,num+1));break;
-				}
-			case ')':
-				cons = null;break;
-			case "defun":
-				cons = new Cons("defun",Term[num],MakeCons(Term,num+1));break;
-			case '':
+	console.log(num);
+	switch(Term[num]){
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case '%':
+		case "if":
+			cons = new Cons("Operation", Term[num], MakeCons(Term,num+1));break;
+		case '(':
+			if(num == 0){
+				cons = new Cons("Car", Term[num],MakeCons(Term,num+1));break;
+			}
+			else{
+				cons = new Cons("Car", MakeCons(Term, num+1),MakeCons(Term,num+1));break;
+			}
+		case ')':
+			cons = null;break;
+			num++;
+		case "defun":
+			cons = new Cons("defun",Term[num],MakeCons(Term,num+1));break;
+		case '':
+				num++;
 				break;
-			default:
-				var number = parseInt(Term[num]);
-				cons = new Cons("number", number, MakeCons(Term, num+1));break;
-		}	
+		default:				
+			var number = parseInt(Term[num]);
+			cons = new Cons("number", number, MakeCons(Term, num+1));break;
 	}
-	console.log(cons);		
 }
