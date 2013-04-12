@@ -50,7 +50,7 @@ var Analysis = function(line){
 		}
 	}
 	console.log(Term);
-	MakeCons(Term,0);
+	console.log(CalcCons(MakeCons(Term,0)));
 }
 
 
@@ -69,30 +69,95 @@ var MakeCons = function(Term,num){
 	var cons;
 	MakeCons.count = num;
 	console.log(MakeCons.count);
-	switch(Term[MakeCons.count]){
+	chara = Term[MakeCons.count]
+	switch(chara){
 		case '+':
 		case '-':
 		case '*':
 		case '/':
 		case '%':
+		case '<':
+		case '>':
+		case '=':
 		case "if":
-			cons = new Cons("Operation", Term[MakeCons.count], MakeCons(Term,MakeCons.count+1));break;
+			cons = new Cons("Operation", chara, MakeCons(Term,MakeCons.count+1));break;
 		case '(':
 			if(num == 0){
-				cons = new Cons("car", Term[MakeCons.count],MakeCons(Term,MakeCons.count+1));break;
+				cons = new Cons("car", MakeCons(Term,MakeCons.count+1),null);break;
 			}
 			else{
 				cons = new Cons("car", MakeCons(Term, MakeCons.count+1),MakeCons(Term,MakeCons.count+1));break;
 			}
 		case ')':
 			cons = null;break;
+		case "setq":
+			cons = new Cons("setq",chara,MakeCons(Term,MakeCons.count+1)); break;
 		case "defun":
-			cons = new Cons("defun",Term[MakeCons.count],MakeCons(Term,MakeCons.count+1));break;
-		case '':
-				num++;
-				break;
-		default:				
-			var number = parseInt(Term[MakeCons.count]);
-			cons = new Cons("number", number, MakeCons(Term, MakeCons.count+1));break;
+			cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));break;
+		default:
+			if(chara.startsWith(/[a-zA-Z]/){
+				cons = new Cons("Letter", chara,MakeCons(Term,MakeCons.count+1));		
+		}
+			else if(chara.startsWith(/[0-9]/)){
+				var number = parseInt(chara);
+				cons = new Cons("number", number, MakeCons(Term, MakeCons.count+1));break;
+		}
+	}
+	return cons;
+}
+
+var CalcCons = function(cons){
+	switch(cons.type){
+		case "number":
+			return cons.car;break;
+		case "Letter":
+			return cons.car;break;
+		case "Operation":
+			switch(cons.car){
+				case '+':
+					return CalcCons(cons.cdr) + CalcCons(cons.cdr.cdr); break;
+				case '-':
+					return CalcCons(cons.cdr) - CalcCons(cons.cdr.cdr); break;
+				case '/':
+					return CalcCons(cons.cdr) / CalcCons(cons.cdr.cdr); break;
+				case '*':
+					return CalcCons(cons.cdr) * CalcCons(cons.cdr.cdr); break;
+				case '%':
+					return CalcCons(cons.cdr) % CalcCons(cons.cdr.cdr); break;
+				case '<':
+					if (CalcCons(cons.cdr) < CalcCons(cons.cdr.cdr)){
+						return "T";
+					}else{
+						return "Nil";
+					}
+				case '>':
+					if(CalcCons(cons.cdr) > CalcCons(cons.cdr.cdr)){
+						return "T";
+					}else{
+						return "Nil";
+					}
+				case '=':
+					if(CalcCons(cons.cdr) = CalcCons(cons.cdr.cdr)){
+						return "T";
+					}else{
+						return "Nil";
+					}
+				case "if":
+					useIf(cons.cdr, cons.cdr.cdr); break;
+				}
+			case "car":
+				return CalcCons(cons.car); break;
+			case "setq":
+				setq(CalcCons(cons.cdr),CalcCons(cons.cdr.cdr));break;
+			case "defun":
+				deFun(CalcCons(cons.cdr), cons.cdr.cdr.car, cons.cdr.cdr.cdr.car); break;
 	}
 }
+
+var setq = function(variable,value){
+	variable = value;
+}
+
+var deFun = function(func, args,fomula){
+}
+	
