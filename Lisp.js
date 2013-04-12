@@ -45,7 +45,7 @@ var Analysis = function(line){
 		}else if(character == " "){
 			indexIn++;
 		}
-		else{
+		else{	
 			Term[indexOut] = character; indexIn++; indexOut++;
 		}
 	}
@@ -67,32 +67,32 @@ var Cons = (function(){
 
 var MakeCons = function(Term,num){
 	var cons;
-	console.log(num);
-	switch(Term[num]){
+	MakeCons.count = num;
+	console.log(MakeCons.count);
+	switch(Term[MakeCons.count]){
 		case '+':
 		case '-':
 		case '*':
 		case '/':
 		case '%':
 		case "if":
-			cons = new Cons("Operation", Term[num], MakeCons(Term,num+1));break;
+			cons = new Cons("Operation", Term[MakeCons.count], MakeCons(Term,MakeCons.count+1));break;
 		case '(':
 			if(num == 0){
-				cons = new Cons("Car", Term[num],MakeCons(Term,num+1));break;
+				cons = new Cons("car", Term[MakeCons.count],MakeCons(Term,MakeCons.count+1));break;
 			}
 			else{
-				cons = new Cons("Car", MakeCons(Term, num+1),MakeCons(Term,num+1));break;
+				cons = new Cons("car", MakeCons(Term, MakeCons.count+1),MakeCons(Term,MakeCons.count+1));break;
 			}
 		case ')':
 			cons = null;break;
-			num++;
 		case "defun":
-			cons = new Cons("defun",Term[num],MakeCons(Term,num+1));break;
+			cons = new Cons("defun",Term[MakeCons.count],MakeCons(Term,MakeCons.count+1));break;
 		case '':
 				num++;
 				break;
 		default:				
-			var number = parseInt(Term[num]);
-			cons = new Cons("number", number, MakeCons(Term, num+1));break;
+			var number = parseInt(Term[MakeCons.count]);
+			cons = new Cons("number", number, MakeCons(Term, MakeCons.count+1));break;
 	}
 }
