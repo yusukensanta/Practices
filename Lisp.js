@@ -49,6 +49,7 @@ var Analysis = function(line){
 			Term[indexOut] = character; indexIn++; indexOut++;
 		}
 	}
+	console.log(Term);
 	MakeCons(Term,0);
 }
 
@@ -65,10 +66,33 @@ var Cons = (function(){
 
 
 var MakeCons = function(Term,num){
-	for(var i = num; i < Term.length;i++){
-		if(Term[i] == ")"){
-			break;
+	var cons;
+	while(num <= Term.length){
+		switch(Term[num]){
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '%':
+			case "if":
+				cons = new Cons("Operation", Term[num], MakeCons(Term,num+1));break;
+			case '(':
+				if(num == 0){
+					cons = new Cons("Car", Term[num],MakeCons(Term,num+1));break;
+				}
+				else{
+					cons = new Cons("Car", MakeCons(Term, num+1),MakeCons(Term,num+1));break;
+				}
+			case ')':
+				cons = null;break;
+			case "defun":
+				cons = new Cons("defun",Term[num],MakeCons(Term,num+1));break;
+			case '':
+				break;
+			default:
+				var number = parseInt(Term[num]);
+				cons = new Cons("number", number, MakeCons(Term, num+1));break;
+		}	
 	}
+	console.log(cons);		
 }
-
-	
