@@ -5,26 +5,26 @@ repl.setPrompt(">>>");
 
 repl.prompt();
 
-repl.on("line",function(line){
+repl.on("line",function(line) {
 	Analysis(line);
 	repl.prompt();
 	});
 	
-	repl.on("close",function(){
+	repl.on("close",function() {
 		console.log("bye!");
 	
 	});
 
 //字句解析を実行する関数
-var Analysis = function(line){
+var Analysis = function(line) {
 	
 	var Term = [];//字句解析した文字列を格納する配列
 	var indexIn  = 0, indexOut = 0, character;
 
 	//入力文字列を読み込み、字句解析を実行
-	while(indexIn < line.length){
+	while(indexIn < line.length) {
 		character = line.charAt(indexIn);
-		if(character.match(/[0-9]/) || character.match("-")){
+		if(character.match(/[0-9]/) || character.match("-")) {
 			var countIn1 = indexIn + 1;
 			while(line.charAt(countIn1) != " " && countIn1 <= line.length && line.charAt(countIn1).match(/[0-9]/)){
 				character = character + line.charAt(countIn1);
@@ -34,7 +34,7 @@ var Analysis = function(line){
 			Term[indexOut] = character;		
 			indexOut++;	
 		}
-		else if(character.match(/[a-zA-Z]/)){
+		else if(character.match(/[a-zA-Z]/)) {
 			var countIn2 = indexIn + 1; 
 			while(line.charAt(countIn2) != " " && countIn2 <=line.length && line.charAt(countIn2).match(/[a-zA-Z]/)) {
 				character = character + line.charAt(countIn2)
@@ -43,10 +43,9 @@ var Analysis = function(line){
 			indexIn = countIn2;
 			Term[indexOut] = character;
 			indexOut++;
-		}else if(character == " "){
+		} else if(character == " ") {
 			indexIn++;
-		}
-		else{	
+		} else {	
 			Term[indexOut] = character; indexIn++; indexOut++;
 		}
 	}
@@ -56,8 +55,8 @@ var Analysis = function(line){
 
 
 
-var Cons = (function(){
-	function Cons(type,car,cdr){
+var Cons = (function() {
+	function Cons(type,car,cdr) {
 		this.type = type;
 		this.car  = car;
 		this.cdr  = cdr;
@@ -67,12 +66,12 @@ var Cons = (function(){
 
 
 //Cons Cellの生成
-var MakeCons = function(Term,num){
+var MakeCons = function(Term,num) {
 	var cons;
 	MakeCons.count = num;
 	console.log(MakeCons.count);
 	chara = Term[MakeCons.count]
-	switch(chara){
+	switch(chara) {
 		case '+':
 		case '-':
 		case '*':
@@ -84,10 +83,9 @@ var MakeCons = function(Term,num){
 		case "if":
 			cons = new Cons("Operation", chara, MakeCons(Term,MakeCons.count+1));break;
 		case '(':
-			if(num == 0){
+			if(num == 0) {
 				cons = new Cons("car", MakeCons(Term,MakeCons.count+1),null);break;
-			}
-			else{
+			} else {
 				cons = new Cons("car", MakeCons(Term, MakeCons.count+1),MakeCons(Term,MakeCons.count+1));break;
 			}
 		case ')':
@@ -98,9 +96,9 @@ var MakeCons = function(Term,num){
 			cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));break;
 		default:
 			var number = parseInt(chara);
-			if(isNaN(number)){
+			if(isNaN(number)) {
 				cons = new Cons("Letter", chara , MakeCons(Term,MakeCons.count+1));break;
-			}else{
+			} else {
 				cons = new Cons("Number", number, MakeCons(Term, MakeCons.count+1));break;
 		}
 	}
@@ -109,38 +107,42 @@ var MakeCons = function(Term,num){
 
 
 var variable = {}; //変数定義用
-var memoryOfchar = []; //変数名の一時保存用
-var memoryOffunc = []; //関数名の一時保存用
+var func     = {}; //関数定義用
+var listOfchar = []; //変数名の一時保存用
+var listOfvaria= [];
+var listOffunc = []; //関数名の一時保存用
 
 
 //Consの中身を計算
-var CalcCons = function(cons){
-	switch(cons.type){
+var CalcCons = function(cons) {
+	switch(cons.type) {
 		case "Number":
 			return cons.car;break;
 		case "Letter":
 			var i = 0,j = 0;
 			var signal = null;
-			while(i < memoryOfchar.length){
-				if(cons.car == memoryOfchar[i]){
+			while(i < listOfchar.length) {
+				if(cons.car == listOfchar[i]) {
 					signal = "Reserved as a Variable";break;
 				}
 				i++;
 			}
-			while(j < memoryOffunc.length){
-				if(cons.car == memoryOffunc[j]){
+			while(j < listOffunc.length) {
+				if(cons.car == listOffunc[j]) {
 					signal = "Reserved as a Func";break;
 				}
 				j++;
 			}
 			
-			if(signal == "Reserved as a Variable"){
+			if(signal == "Reserved as a Variable") {
 
 				return variable[cons.car];break;
 
-			}else if(signal == "Reserved as a Func"){
-				break;
-			}else{
+			} else if(signal == "Reserved as a Func") {
+				
+				return func[cons.car];break;
+			
+			} else {
 				return cons.car;break;
 			}
 		case "Operation":
@@ -156,42 +158,60 @@ var CalcCons = function(cons){
 				case '%':
 					return CalcCons(cons.cdr) % CalcCons(cons.cdr.cdr); break;
 				case '<':
-					if (CalcCons(cons.cdr) < CalcCons(cons.cdr.cdr)){
+					if (CalcCons(cons.cdr) < CalcCons(cons.cdr.cdr)) {
 						return "T";
-					}else{
+					} else {
 						return "Nil";
 					}
 				case '>':
-					if(CalcCons(cons.cdr) > CalcCons(cons.cdr.cdr)){
+					if(CalcCons(cons.cdr) > CalcCons(cons.cdr.cdr)) {
 						return "T";
-					}else{
+					} else {
 						return "Nil";
 					}
 				case '=':
-					if(CalcCons(cons.cdr) = CalcCons(cons.cdr.cdr)){
+					if(CalcCons(cons.cdr) = CalcCons(cons.cdr.cdr)) {
 						return "T";
-					}else{
+					} else {
 						return "Nil";
 					}
 				case "if":
-					if(CalcCons(cons.cdr.car)!="Nil"){
+					if(CalcCons(cons.cdr.car) != "Nil") {
 						return CalcCons(cons.cdr.cdr);
-					}else{
+					} else {
 						return CalcCons(cons.cdr.cdr.cdr);
 					}
 				}
 		case "car":
 			return CalcCons(cons.car); break;
+		case "arg":
+			
 		case "setq":
 			var tempchar = CalcCons(cons.cdr);
-			console.log(tempchar);
-			memoryOfchar.push(tempchar);
-			variable[tempchar] = CalcCons(cons.cdr.cdr);
+			listOfchar.push(tempchar);
+			variable[tempchar] = CalcCons(cons.cdr.cdr); break;
 		case "defun":
 			var tempFunc = CalcCons(cons.cdr);
-			memoryOffunc.push(tempFunc);
-			//deFun(tempFunc, cons.cdr.cdr, cons.cdr.cdr.cdr); break;
+			listOffunc.push(tempFunc);
+			func[tempFunc] = CallFunc(cons.cdr.cdr, cons.cdr.cdr.cdr);break;
+	
 	}
 }
 
-
+var CallFunc = function(variable,fomula){
+	var varies = [];
+	CallFunc.id = 0;
+	
+	variable.type = "arg";
+	
+	function input(variable) {
+		varies[CallFunc.id] = variable.car;
+		if(variable.cdr != "undefined") {
+			CallFunc.id++;
+			input(variable.cdr);
+		}
+		return;
+	}
+	
+	
+}
