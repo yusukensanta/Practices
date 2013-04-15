@@ -99,7 +99,7 @@ var MakeCons = function(Term,num){
 		default:
 			var number = parseInt(chara);
 			if(isNaN(number)){
-				cons = new Cons("Letter",chara,MakeCons(Term,MakeCons.count+1));break;
+				cons = new Cons("Letter", chara , MakeCons(Term,MakeCons.count+1));break;
 			}else{
 				cons = new Cons("Number", number, MakeCons(Term, MakeCons.count+1));break;
 		}
@@ -108,8 +108,9 @@ var MakeCons = function(Term,num){
 }
 
 
-var func = {}; //変数定義用
+var variable = {}; //変数定義用
 var memoryOfchar = []; //変数名の一時保存用
+var memoryOffunc = []; //関数名の一時保存用
 
 
 //Consの中身を計算
@@ -118,16 +119,27 @@ var CalcCons = function(cons){
 		case "Number":
 			return cons.car;break;
 		case "Letter":
-			var i = 0,flag = "false";
+			var i = 0,j = 0;
+			var signal = null;
 			while(i < memoryOfchar.length){
 				if(cons.car == memoryOfchar[i]){
-					flag = "true";break;
+					signal = "Reserved as a Variable";break;
 				}
 				i++;
 			}
-				
-			if(flag == "true"){
-				return func[cons.car];break
+			while(j < memoryOffunc.length){
+				if(cons.car == memoryOffunc[j]){
+					signal = "Reserved as a Func";break;
+				}
+				j++;
+			}
+			
+			if(signal == "Reserved as a Variable"){
+
+				return variable[cons.car];break;
+
+			}else if(signal == "Reserved as a Func"){
+				break;
 			}else{
 				return cons.car;break;
 			}
@@ -172,9 +184,14 @@ var CalcCons = function(cons){
 			return CalcCons(cons.car); break;
 		case "setq":
 			var tempchar = CalcCons(cons.cdr);
+			console.log(tempchar);
 			memoryOfchar.push(tempchar);
-			func[tempchar] = CalcCons(cons.cdr.cdr);break;
+			variable[tempchar] = CalcCons(cons.cdr.cdr);
 		case "defun":
-			deFun(CalcCons(cons.cdr), cons.cdr.cdr.car, cons.cdr.cdr.cdr.car); break;
+			var tempFunc = CalcCons(cons.cdr);
+			memoryOffunc.push(tempFunc);
+			//deFun(tempFunc, cons.cdr.cdr, cons.cdr.cdr.cdr); break;
 	}
 }
+
+
