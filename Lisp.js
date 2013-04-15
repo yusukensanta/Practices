@@ -15,12 +15,13 @@ repl.on("line",function(line){
 	
 	});
 
+//字句解析を実行する関数
 var Analysis = function(line){
 	
 	var Term = [];//字句解析した文字列を格納する配列
 	var indexIn  = 0, indexOut = 0, character;
 
-	//入力文字列を読み込む
+	//入力文字列を読み込み、字句解析を実行
 	while(indexIn < line.length){
 		character = line.charAt(indexIn);
 		if(character.match(/[0-9]/) || character.match("-")){
@@ -65,10 +66,11 @@ var Cons = (function(){
 })();
 
 
+//Cons Cellの生成
 var MakeCons = function(Term,num){
 	var cons;
 	MakeCons.count = num;
-//	console.log(MakeCons.count);
+	console.log(MakeCons.count);
 	chara = Term[MakeCons.count]
 	switch(chara){
 		case '+':
@@ -99,19 +101,36 @@ var MakeCons = function(Term,num){
 			if(isNaN(number)){
 				cons = new Cons("Letter",chara,MakeCons(Term,MakeCons.count+1));break;
 			}else{
-				cons = new Cons("number", number, MakeCons(Term, MakeCons.count+1));break;
+				cons = new Cons("Number", number, MakeCons(Term, MakeCons.count+1));break;
 		}
 	}
 	return cons;
 }
 
+
+var func = {}; //変数定義用
+var memoryOfchar = []; //変数名の一時保存用
+
+
+//Consの中身を計算
 var CalcCons = function(cons){
-	var func = {};
 	switch(cons.type){
-		case "number":
+		case "Number":
 			return cons.car;break;
 		case "Letter":
-			return cons.car;break;
+			var i = 0,flag = "false";
+			while(i < memoryOfchar.length){
+				if(cons.car == memoryOfchar[i]){
+					flag = "true";break;
+				}
+				i++;
+			}
+				
+			if(flag == "true"){
+				return func[cons.car];break
+			}else{
+				return cons.car;break;
+			}
 		case "Operation":
 			switch(cons.car){
 				case '+':
@@ -152,16 +171,10 @@ var CalcCons = function(cons){
 		case "car":
 			return CalcCons(cons.car); break;
 		case "setq":
-			func[CalcCons(cons.cdr)] = CalcCons(cons.cdr.cdr);break;
+			var tempchar = CalcCons(cons.cdr);
+			memoryOfchar.push(tempchar);
+			func[tempchar] = CalcCons(cons.cdr.cdr);break;
 		case "defun":
 			deFun(CalcCons(cons.cdr), cons.cdr.cdr.car, cons.cdr.cdr.cdr.car); break;
 	}
 }
-
-var setq = function(variable,value){
-	variable = value;
-}
-
-var deFun = function(func, args,fomula){
-}
-	
