@@ -68,7 +68,7 @@ var Cons = (function(){
 var MakeCons = function(Term,num){
 	var cons;
 	MakeCons.count = num;
-	console.log(MakeCons.count);
+//	console.log(MakeCons.count);
 	chara = Term[MakeCons.count]
 	switch(chara){
 		case '+':
@@ -95,11 +95,10 @@ var MakeCons = function(Term,num){
 		case "defun":
 			cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));break;
 		default:
-			if(chara.startsWith(/[a-zA-Z]/){
-				cons = new Cons("Letter", chara,MakeCons(Term,MakeCons.count+1));		
-		}
-			else if(chara.startsWith(/[0-9]/)){
-				var number = parseInt(chara);
+			var number = parseInt(chara);
+			if(isNaN(number)){
+				cons = new Cons("Letter",chara,MakeCons(Term,MakeCons.count+1));break;
+			}else{
 				cons = new Cons("number", number, MakeCons(Term, MakeCons.count+1));break;
 		}
 	}
@@ -107,6 +106,7 @@ var MakeCons = function(Term,num){
 }
 
 var CalcCons = function(cons){
+	var func = {};
 	switch(cons.type){
 		case "number":
 			return cons.car;break;
@@ -143,14 +143,18 @@ var CalcCons = function(cons){
 						return "Nil";
 					}
 				case "if":
-					useIf(cons.cdr, cons.cdr.cdr); break;
+					if(CalcCons(cons.cdr.car)!="Nil"){
+						return CalcCons(cons.cdr.cdr);
+					}else{
+						return CalcCons(cons.cdr.cdr.cdr);
+					}
 				}
-			case "car":
-				return CalcCons(cons.car); break;
-			case "setq":
-				setq(CalcCons(cons.cdr),CalcCons(cons.cdr.cdr));break;
-			case "defun":
-				deFun(CalcCons(cons.cdr), cons.cdr.cdr.car, cons.cdr.cdr.cdr.car); break;
+		case "car":
+			return CalcCons(cons.car); break;
+		case "setq":
+			func[CalcCons(cons.cdr)] = CalcCons(cons.cdr.cdr);break;
+		case "defun":
+			deFun(CalcCons(cons.cdr), cons.cdr.cdr.car, cons.cdr.cdr.cdr.car); break;
 	}
 }
 
