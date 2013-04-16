@@ -64,6 +64,7 @@ var Cons = (function() {
 	return Cons;
 })();
 
+var funcFlag = 0;
 
 //Cons Cellの生成
 var MakeCons = function(Term,num) {
@@ -93,23 +94,26 @@ var MakeCons = function(Term,num) {
 		case "setq":
 			cons = new Cons("setq",chara,MakeCons(Term,MakeCons.count+1)); break;
 		case "defun":
-			cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));break;
+			cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));
+			funcFlag = 1;	break;
 		default:
 			var number = parseInt(chara);
 			if(isNaN(number)) {
 				cons = new Cons("Letter", chara , MakeCons(Term,MakeCons.count+1));break;
 			} else {
 				cons = new Cons("Number", number, MakeCons(Term, MakeCons.count+1));break;
-		}
-	}
+				
+			}
 	return cons;
+	}
 }
 
 
 var variable = {}; //変数定義用
 var func     = {}; //関数定義用
+var args     = {}; //引数用
 var listOfchar = []; //変数名の一時保存用
-var listOfvaria= [];
+var listOfargs = []; //引数名の一時保存用
 var listOffunc = []; //関数名の一時保存用
 
 
@@ -140,7 +144,9 @@ var CalcCons = function(cons) {
 
 			} else if(signal == "Reserved as a Func") {
 				
-				return func[cons.car];break;
+				Substitute(cons.cdr,cons.car,0);
+				func[cons.car];
+				break;
 			
 			} else {
 				return cons.car;break;
@@ -184,34 +190,32 @@ var CalcCons = function(cons) {
 				}
 		case "car":
 			return CalcCons(cons.car); break;
-		case "arg":
-			
 		case "setq":
-			var tempchar = CalcCons(cons.cdr);
-			listOfchar.push(tempchar);
-			variable[tempchar] = CalcCons(cons.cdr.cdr); break;
+			var c = CalcCons(cons.cdr);
+			listOfchar.push(c);
+			variable[c] = CalcCons(cons.cdr.cdr); break;
 		case "defun":
-			var tempFunc = CalcCons(cons.cdr);
-			listOffunc.push(tempFunc);
-			func[tempFunc] = CallFunc(cons.cdr.cdr, cons.cdr.cdr.cdr);break;
+			var nameOfFunc = CalcCons(cons.cdr);
+			listOffunc.push(nameOfFunc);
+			pushTOargs (cons.cdr,nameOfFunc);
+			func[nameOfFunc] = cons.cdr.cdr.cdr; break;
 	
-	}
-}
-
-var CallFunc = function(variable,fomula){
-	var varies = [];
-	CallFunc.id = 0;
-	
-	variable.type = "arg";
-	
-	function input(variable) {
-		varies[CallFunc.id] = variable.car;
-		if(variable.cdr != "undefined") {
-			CallFunc.id++;
-			input(variable.cdr);
+			function pushing (cons,nameOfFunc) {
+				while(cons.cdr != "undefined") {
+					var charname = cons.cdr.car;
+					args[nameOfFunc].push(charname);
+					listOfargs.push(charname);
+					pushing(cons.cdr,nameOfFunc);
+				}
+			}
 		}
-		return;
+		function substitute(cons,nameOfFunc,counter) {
+			if(cons.cdr != "undefined" ) {
+				return;
+			}
+			var tempNum = CalcCons(cons.cdr);
+			variable[args[nameOfFunc][counter]] = tempNum;
+			substitute(cons.cdr,nameOfFunc,counter+1);
+		}
 	}
-	
-	
 }
