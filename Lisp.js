@@ -51,7 +51,7 @@ var Analysis = function(line) {
 	}
 	console.log(Term);
 	console.log(CalcCons(MakeCons(Term,0)));
-//	console.log(MakeCons(Term,0));
+	//	console.log(MakeCons(Term,0));
 }
 
 
@@ -104,16 +104,17 @@ var MakeCons = function(Term,num) {
 
 				}
 		}
-		return cons;
+	return cons;
 }
 
 
 var variable = {}; //変数定義用
 var func     = {}; //関数定義用
-var args     = {}; //引数用
+var args     = []; //引数格納用
+var funcInfo = {};
+var listOfargs = [];
 var listOfchar = []; //変数名及び引数名の一時保存用
 var listOffunc = []; //関数名の一時保存用
-
 
 //Consの中身を計算
 var CalcCons = function(cons) {
@@ -140,7 +141,7 @@ var CalcCons = function(cons) {
 			} else if(signal == "Reserved as a Func") {
 
 				Substitute(cons.cdr,cons.car,0);
-				func[cons.car];
+				return CalcCons(func[cons.car]);
 				break;
 
 			} else {
@@ -190,20 +191,36 @@ var CalcCons = function(cons) {
 			listOfchar.push(c);
 			variable[c] = CalcCons(cons.cdr.cdr); break;
 		case "defun":
+			var funcTable;
 			var nameOfFunc = CalcCons(cons.cdr);
 			listOffunc.push(nameOfFunc);
-			pushTOargs (cons.cdr,nameOfFunc);
-			func[nameOfFunc] = cons.cdr.cdr.cdr; break;
 
-			function pushTOargs (cons,nameOfFunc) {
-				while(cons.cdr != "undefined") {
-					var charname = cons.cdr.car;
-					args[nameOfFunc].push(charname);
-					listOfchar.push(charname);
-					pushing(cons.cdr,nameOfFunc);
-				}
-			}
+			console.log("here");
+
+			func[nameOfFunc] = cons.cdr.cdr.cdr;
+			var counter = 0;
+			argsInput(cons.cdr.cdr);
+			console.log(args);
+			funcTable[nameOfFunc] = Func(nameOfFunc, args);
+
 	}
+	function argsInput(cons) {
+		args[counter] = CalcCons(cons);
+		counter++;
+		
+		if(counter == 1) {
+			if(cons.car.cdr != null) { 
+				var cons1 = cons.car.cdr;
+				argsInput(cons1);
+			}
+		} else {
+			if(cons.cdr != null) {
+				var cons2 = cons.cdr;
+				argsInput(cons2);
+			}
+		}
+	}
+
 	function substitute(cons,nameOfFunc,counter) {
 		if(cons.cdr == "undefined" ) {
 			return;
@@ -212,5 +229,17 @@ var CalcCons = function(cons) {
 		variable[args[nameOfFunc][counter]] = tempNum;
 		substitute(cons.cdr,nameOfFunc,counter+1);
 	}
+
 }
-Analysis("( + 1 1)");
+var Func = (function() {
+		function Func(name,args) {
+		this.name = name;
+		this.args = args;
+		}
+
+		})();
+
+//Analysis("( if ( < 3 2) 2 3)");
+Analysis("( defun fib( n a aaa ) (+ n 2))");
+//Analysis("( n)");
+//Analysis("( defun fib(n) (if(<n 3) 1 (+ (fib(-n 1))(fib(-n 2))))");
