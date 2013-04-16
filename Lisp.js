@@ -51,6 +51,7 @@ var Analysis = function(line) {
 	}
 	console.log(Term);
 	console.log(CalcCons(MakeCons(Term,0)));
+//	console.log(MakeCons(Term,0));
 }
 
 
@@ -93,8 +94,7 @@ var MakeCons = function(Term,num) {
 			case "setq":
 				cons = new Cons("setq",chara,MakeCons(Term,MakeCons.count+1)); break;
 			case "defun":
-				cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));
-				funcFlag = 1;	break;
+				cons = new Cons("defun",chara,MakeCons(Term,MakeCons.count+1));	break;
 			default:
 				var number = parseInt(chara);
 				if(isNaN(number)) {
@@ -103,8 +103,8 @@ var MakeCons = function(Term,num) {
 					cons = new Cons("Number", number, MakeCons(Term, MakeCons.count+1));break;
 
 				}
-				return cons;
 		}
+		return cons;
 }
 
 
@@ -195,7 +195,7 @@ var CalcCons = function(cons) {
 			pushTOargs (cons.cdr,nameOfFunc);
 			func[nameOfFunc] = cons.cdr.cdr.cdr; break;
 
-			function pushing (cons,nameOfFunc) {
+			function pushTOargs (cons,nameOfFunc) {
 				while(cons.cdr != "undefined") {
 					var charname = cons.cdr.car;
 					args[nameOfFunc].push(charname);
@@ -213,4 +213,4 @@ var CalcCons = function(cons) {
 		substitute(cons.cdr,nameOfFunc,counter+1);
 	}
 }
-
+Analysis("( + 1 1)");
