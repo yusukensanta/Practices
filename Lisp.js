@@ -249,7 +249,7 @@ var calcCons = function(cons) {
 	function substitute(cons, funcName, countInput) {
 		var tempNum  = calcCons(cons);
 		substitute.countNum = countInput;
-//		console.log("character which we see is " + funcTable[funcName].args[substitute.countNum]);
+		console.log("character which we see is " + funcTable[funcName].args[substitute.countNum]);
 		variable[funcTable[funcName].args[substitute.countNum]] = tempNum;
 //		console.log("counter = " + substitute.countNum + " Then args's length = " + args.length);
 		
