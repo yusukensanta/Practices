@@ -6,7 +6,7 @@ repl.setPrompt(">>>");
 repl.prompt();
 
 repl.on("line",function(line) {
-		Analysis(line);
+		Analyze(line);
 		repl.prompt();
 		});
 
@@ -23,7 +23,7 @@ var Func = (function() {
 		})();
 
 //字句解析を実行する関数
-var Analysis = function(line) {
+var Analyze = function(line) {
 
 	var Term = [];//字句解析した文字列を格納する配列
 	var indexIn  = 0, indexOut = 0, character;
@@ -118,8 +118,7 @@ var MakeCons = function(Term,num) {
 var variable = {}; //変数定義用
 var func     = {}; //関数定義用
 var args     = []; //引数格納用
-var funcInfo = {};
-var listOfargs = [];
+var funcTable = {};
 var listOfchar = []; //変数名及び引数名の一時保存用
 var listOffunc = []; //関数名の一時保存用
 
@@ -131,11 +130,12 @@ var CalcCons = function(cons) {
 		case "Letter":
 			var i = 0,j  = 0;
 			var signal   = null;
-			while(i < listOfchar.length) {
+			var max      = ChooseLarger(listOfchar.length,listOffunc.length);
+			while(i < max) {
 				if(cons.car == listOfchar[i]) {
 					signal = "Reserved as a Variable";break;
 				}
-				else if(cons.car == listOffunc[j]) {
+				else if(cons.car == listOffunc[i]) {
 					signal = "Reserved as a Func";break;
 				}
 				i++;
@@ -146,16 +146,18 @@ var CalcCons = function(cons) {
 				return variable[cons.car];break;
 
 			} else if(signal == "Reserved as a Func") {
-
-				Substitute(cons.cdr,cons.car,0);
-				return CalcCons(func[cons.car]);
-				break;
+				if(Substitute(cons.cdr,cons.car,0) == "Success"){
+					return CalcCons(func[cons.car]);
+					break;
+				} else {
+                                   	return "Error at Substitution";
+				}
 
 			} else {
 				return cons.car;break;
 			}
 		case "Operation":
-			switch(cons.car){
+			switch(cons.car) {
 				case '+':
 					return CalcCons(cons.cdr) + CalcCons(cons.cdr.cdr); break;
 				case '-':
@@ -167,11 +169,11 @@ var CalcCons = function(cons) {
 				case '%':
 					return CalcCons(cons.cdr) % CalcCons(cons.cdr.cdr); break;
 				case '<':
-					if (CalcCons(cons.cdr) < CalcCons(cons.cdr.cdr)) {
-						return "T";
+					if(CalcCons(cons.cdr) < CalcCons(cons.cdr.cdr)){
+						return "T"; 
 					} else {
 						return "Nil";
-					}
+					} 
 				case '>':
 					if(CalcCons(cons.cdr) > CalcCons(cons.cdr.cdr)) {
 						return "T";
@@ -180,17 +182,18 @@ var CalcCons = function(cons) {
 					}
 				case '=':
 					if(CalcCons(cons.cdr) = CalcCons(cons.cdr.cdr)) {
-						return "T";
+						return "T"; 
 					} else {
-						return "Nil";
-					}
+						return "Nil"; 
+						}
 				case "if":
 					if(CalcCons(cons.cdr.car) != "Nil") {
 						return CalcCons(cons.cdr.cdr);
 					} else {
 						return CalcCons(cons.cdr.cdr.cdr);
 					}
-			}
+				}
+			
 		case "car":
 			return CalcCons(cons.car); break;
 		case "setq":
@@ -198,24 +201,32 @@ var CalcCons = function(cons) {
 			listOfchar.push(c);
 			variable[c] = CalcCons(cons.cdr.cdr); break;
 		case "defun":
-			var funcTable;
 			var nameOfFunc = CalcCons(cons.cdr);
 			listOffunc.push(nameOfFunc);
-
 			console.log("here");
 
 			func[nameOfFunc] = cons.cdr.cdr.cdr;
 			var counter = 0;
 			argsInput(cons.cdr.cdr);
-			console.log(args);
-			console.log("nameOfFunc = " + nameOfFunc);
-			funcTable[nameOfFunc] = new Func(nameOfFunc, args);
-
+			console.log(args.length)
+			console.log(args[0]);
+			funcTable[nameOfFunc] = new Func(nameOfFunc, args);break;
+			console.log(funcTable);
 	}
+	function ChooseLarger(a, b) {
+		if(a > b){
+			return a;
+		} else {
+			return b;
+		}
+	}
+
 	function argsInput(cons) {
-		args[counter] = CalcCons(cons);
+		var tempChar  = CalcCons(cons);
+		args[counter] = tempChar;
+		listOfchar    = tempChar;
 		counter++;
-		
+		console.log(args);
 		if(counter == 1) {
 			if(cons.car.cdr != null) { 
 				var cons1 = cons.car.cdr;
@@ -229,18 +240,22 @@ var CalcCons = function(cons) {
 		}
 	}
 
-	function substitute(cons,nameOfFunc,counter) {
-		if(cons.cdr == "undefined" ) {
-			return;
+	function Substitute(cons,nameOfFunc,counter) {
+		var tempNum  = CalcCons(cons);
+		variable[funcTable[nameOfFunc].args[counter]] = tempNum;
+		console.log("Substituted is "+ tempNum + " and Character is " + funcTable[nameOfFunc].args[counter]);
+		counter++;
+		if(cons.cdr != null) {
+ 			Substitute(cons.cdr, nameOfFunc, counter);
 		}
-		var tempNum = CalcCons(cons.cdr);
-		variable[args[nameOfFunc][counter]] = tempNum;
-		substitute(cons.cdr,nameOfFunc,counter+1);
+		if(counter + 1 < args.length || counter + 1 > args.length) {
+			return "Error";
+		} else {
+			return "Success";
+		}
 	}
-
 }
-
 //Analysis("( if ( < 3 2) 2 3)");
-Analysis("( defun fib( n a aaa ) (+ n 2))");
+Analyze("( defun fib(l m n ) (+ n( + l   m)))");
 //Analysis("( n)");
-//Analysis("( defun fib(n) (if(<n 3) 1 (+ (fib(-n 1))(fib(-n 2))))");
+//Analyze("( defun fib(n) (if(<n 3) 1 (+ (fib(-n 1))(fib(-n 2))))");
