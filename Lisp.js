@@ -14,6 +14,13 @@ repl.on("close",function() {
 		console.log("bye!");
 
 		});
+var Func = (function() {
+		function Func(name,args) {
+		this.name = name;
+		this.args = args;
+		}
+		return Func;
+		})();
 
 //字句解析を実行する関数
 var Analysis = function(line) {
@@ -201,7 +208,8 @@ var CalcCons = function(cons) {
 			var counter = 0;
 			argsInput(cons.cdr.cdr);
 			console.log(args);
-			funcTable[nameOfFunc] = Func(nameOfFunc, args);
+			console.log("nameOfFunc = " + nameOfFunc);
+			funcTable[nameOfFunc] = new Func(nameOfFunc, args);
 
 	}
 	function argsInput(cons) {
@@ -231,13 +239,6 @@ var CalcCons = function(cons) {
 	}
 
 }
-var Func = (function() {
-		function Func(name,args) {
-		this.name = name;
-		this.args = args;
-		}
-
-		})();
 
 //Analysis("( if ( < 3 2) 2 3)");
 Analysis("( defun fib( n a aaa ) (+ n 2))");
